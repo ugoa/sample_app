@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe "StaticPages" do
 
-  let(:base_title) { "Ruby on Rails Tutorial Sample App" }
   #describe "GET /static_pages" do
   #  it "works! (now write some real specs)" do
   #    # Run the generator again with the --webrat flag if you want to use webrat methods/matchers
@@ -10,27 +9,39 @@ describe "StaticPages" do
   #    response.status.should be(200)
   #  end
   #end
+
   subject { page }
+
+  shared_examples_for "all static pages" do
+    it { should have_selector('h1', text: heading) }
+    it { should have_selector('title', text: full_title(page_title)) }
+  end
 
   describe "Home page" do
     before(:each) { visit root_path }
 
-    it { should have_selector('h1', :text => 'Sample App') }
-    it { should have_selector('title', :text => "#{base_title} | Home") }
+    let(:heading)    { 'Sample App' }
+    let(:page_title) { '' }
+
+    it_should_behave_like "all static pages"
   end
 
   describe "Help page" do
     before(:each) { visit help_path }
 
-    it { should have_selector('h1', :text => 'Help') }
-    it { should have_selector('title', :text => "#{base_title} | Help") }
+    let(:heading)    { 'Help' }
+    let(:page_title) { 'Help' }
+
+    it_should_behave_like "all static pages"
   end
 
   describe "About page" do
     before(:each) { visit about_path }
 
-    it { should have_selector('h1', :text => 'About Us') }
-    it { should have_selector('title', :text => "#{base_title} | About Us") }
+    let(:heading)    { 'About' }
+    let(:page_title) { 'About' }
+
+    it_should_behave_like "all static pages"
   end
 
   describe "Contact page" do
