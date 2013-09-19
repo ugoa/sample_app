@@ -12,10 +12,10 @@ describe "User Pages" do
 
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
-    before {visit user_path(user) }
+    before { visit user_path(user) }
 
-    it { should have_selector('h1',     text: user.name) }
-    it { should have_selector('title',  text: user.name) }
+    it { should have_no_selector('h1',     text: user.name) }
+    it { should have_no_selector('title',  text: user.name) }
   end
 
   describe "signup" do
@@ -31,7 +31,7 @@ describe "User Pages" do
         before {click_button submit}
 
         it { should have_selector('title', text: 'Sign up')}
-        it { should have_content('error')}
+        it { should have_error_message('error')}
       end
     end
 
@@ -52,6 +52,7 @@ describe "User Pages" do
         let(:user) { User.find_by_email('user@example.com') }
         it { should have_selector('title', text: user.name) }
         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+        it { should have_link('Sign out')}
       end
     end
   end

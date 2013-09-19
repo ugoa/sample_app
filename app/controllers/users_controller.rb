@@ -1,7 +1,11 @@
 class UsersController < ApplicationController
 
   def show
-    @user = User.find(params[:id])
+    if signed_in?
+      @user = User.find(params[:id])
+    else
+      redirect_to root_path
+    end
   end
 
   def new
@@ -11,6 +15,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
+      sign_in @user
       flash[:success] = "Welcome to the Dream Land!"
       redirect_to @user
     else
