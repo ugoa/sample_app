@@ -14,9 +14,9 @@ describe "Authentication" do
     before { visit signin_path }
 
     describe "with invalid information" do
-      before  do
+      before do
         visit signin_path
-        click_button  "Sign in"
+        click_button "Sign in"
       end
 
       it { should return_page_of('Sign in') }
@@ -39,7 +39,7 @@ describe "Authentication" do
       it { should have_link('Profile', href: user_path(user)) }
       it { should have_link('Settings', href: edit_user_path(user)) }
       it { should have_link('Sign out', href: signout_path) }
-      it {should_not return_page_of('Sign in') }
+      it { should_not return_page_of('Sign in') }
 
       describe "try to sign in again" do
         before { visit signin_path }
@@ -66,7 +66,24 @@ describe "Authentication" do
         end
 
         describe "submitting to the update action" do
-          before { put user_path(user) }  # #put is not a Capybara but a Rspec feature.
+          before { put user_path(user) } # #put is not a Capybara but a Rspec feature.
+          specify { response.should redirect_to(signin_path) }
+        end
+      end
+
+      describe "in the Tvveets controller" do
+        describe "submitting to the create action" do
+          before { post tvveets_path }
+
+          specify { response.should redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before do
+            tvveet = FactoryGirl.create(:tvveet)
+            delete tvveet_path(tvveet)
+          end
+
           specify { response.should redirect_to(signin_path) }
         end
       end
@@ -81,7 +98,7 @@ describe "Authentication" do
       describe "visiting User#edit page" do
         before { visit edit_user_path(wrong_user) }
 
-        it { should have_no_selector('title', text: full_title('Edit user'))}
+        it { should have_no_selector('title', text: full_title('Edit user')) }
       end
 
       describe "submitting a PUT request to User#update action" do
@@ -92,7 +109,7 @@ describe "Authentication" do
 
     # Friendly forwarding section 9.2.3
     describe "for not-signed-in user" do
-      let(:user) {FactoryGirl.create(:user)}
+      let(:user) { FactoryGirl.create(:user) }
 
       describe "while attemping visiting a protected page" do
         before do
