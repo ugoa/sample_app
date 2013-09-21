@@ -12,7 +12,7 @@ RSpec::Matchers.define :return_page_of do |topic|
 end
 
 def full_title(page_title)
-  base_title = "Ruby on Rails Tutorial Sample App"
+  base_title = "Tvvitter, a mock Twitter but better"
   if page_title.empty?
     base_title
   else
