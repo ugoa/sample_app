@@ -1,6 +1,12 @@
 class UsersController < ApplicationController
-  before_filter :signed_in_user, only: [:edit, :update]
+  before_filter :signed_in_user, only: [:index, :edit, :update, :destroy]
   before_filter :correct_user, only: [:edit, :update]
+  before_filter :administrator, only: :destroy
+  before_filter :signedin_user_limit, only: [:new, :create]
+
+  def index
+    @users = User.paginate(page: params[:page], per_page: 10)
+  end
 
   def show
     @user = User.find(params[:id])
@@ -35,6 +41,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def destroy
+    @target_user.destroy
+    flash[:success] = "User destroyed."
+    redirect_to users_path
+  end
+
   private
   def signed_in_user
     unless signed_in?
@@ -46,5 +58,19 @@ class UsersController < ApplicationController
   def correct_user
     @user = User.find(params[:id])
     redirect_to(root_path) unless current_user?(@user)
+  end
+
+  def administrator
+    @target_user = User.find(params[:id])
+    unless current_user.admin? && @target_user && current_user != @target_user
+      redirect_to(root_path)
+    end
+  end
+
+  def signedin_user_limit
+    if signed_in?
+      flash[:error] = "Invalid operation: cannot create new role when signed in."
+      redirect_to @current_user
+    end
   end
 end

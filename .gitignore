@@ -16,3 +16,6 @@
 *.swp
 /.idea
 .rspec
+
+#Ignore public assets
+/public/assets

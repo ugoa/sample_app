@@ -4,6 +4,13 @@ RSpec::Matchers.define :have_error_message do |message|
   end
 end
 
+RSpec::Matchers.define :return_page_of do |topic|
+  match do |page|
+    page.should have_selector('h1', text: topic)
+    page.should have_selector('title', text: topic)
+  end
+end
+
 def full_title(page_title)
   base_title = "Ruby on Rails Tutorial Sample App"
   if page_title.empty?
@@ -14,6 +21,8 @@ def full_title(page_title)
 end
 
 def valid_sign_in(user)
+  visit signin_path
+
   fill_in "Email", with: user.email
   fill_in "Password", with: user.password
   click_button "Sign in"

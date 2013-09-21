@@ -12,13 +12,16 @@ describe "User Pages" do
 
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
-    before { visit user_path(user) }
+    before do
+      valid_sign_in user
+      visit user_path(user)
+    end
 
     it { should have_selector('h1',     text: user.name) }
     it { should have_selector('title',  text: user.name) }
   end
 
-  describe "signup" do
+  describe "#signup" do
     before { visit signup_path }
     let(:submit) { "Create my account" }
 
@@ -57,10 +60,9 @@ describe "User Pages" do
     end
   end
 
-  describe "edit" do
+  describe "#edit" do
     let(:user) { FactoryGirl.create(:user) }
     before do
-      visit signin_path
       valid_sign_in user
       visit edit_user_path(user)
     end
@@ -96,4 +98,92 @@ describe "User Pages" do
       specify { user.reload.email.should == new_email }
     end
   end
+
+  describe "#index" do
+
+    let(:user) { FactoryGirl.create(:user) }
+
+    before(:all) { 30.times { FactoryGirl.create(:user) } }
+    after(:all) { User.delete_all}
+
+    before do
+      valid_sign_in(user)
+      visit users_path
+    end
+
+    it { should return_page_of('All users')}
+
+    describe "pagination" do
+      it { should have_selector('div.pagination') }
+
+      it "should list each user" do
+        User.paginate(page: 1, per_page: 10).each do |user|
+          page.should have_selector('li', text:user.name)
+        end
+      end
+    end
+  end
+
+  describe "delete links" do
+    it {should_not have_link('delete') }
+
+    describe "as an admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+
+      before do
+        valid_sign_in admin
+        visit users_path
+      end
+
+      it "should be able to delete another user" do
+        expect { click_link('delete').to change(User.count).by(-1) }
+      end
+
+      it { should return_page_of('All users') }
+      it { should_not have_link('delete', href: user_path(admin)) }
+
+      describe "deleting himself...pfft.." do
+        before { delete user_path(admin) }
+
+        specify { response.should redirect_to(root_path) }
+      end
+    end
+
+    describe "as an non-admin user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:non_admin) { FactoryGirl.create(:user) }
+
+      before { valid_sign_in non_admin }
+
+      describe "submitting a DELETE request to the User#destory action" do
+        before { delete user_path(user) }
+
+        specify { response.should redirect_to(root_path) }
+      end
+    end
+  end
+
+  describe "#sign_in" do
+    let(:user) { FactoryGirl.create(:user) }
+    before do
+      valid_sign_in(user)
+    end
+
+    describe "signed-in user visit signup page" do
+      before { visit signup_path }
+
+      it { should have_error_message("Invalid") }
+
+      #describe "sending post request to user_path " do
+      #  let(:new_user) { FactoryGirl.build(:user) }
+      #
+      #  before do
+      #    post :create, user: @new_user
+      #  end
+      #
+      #  it { should have_error_message("Invalid") }
+      #end
+    end
+  end
+
 end

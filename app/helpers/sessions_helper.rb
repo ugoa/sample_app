@@ -20,6 +20,10 @@ module SessionsHelper
     @current_user == user
   end
 
+  def target_user
+    @target_user = User.find(params[:id])
+  end
+
   def sign_out
     self.current_user = nil
     cookies.delete(:remember_token)

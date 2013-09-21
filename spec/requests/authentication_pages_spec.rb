@@ -7,17 +7,19 @@ describe "Authentication" do
   describe "signin page" do
     before { visit signin_path }
 
-    it { should have_selector('h1', text: 'Sign in')}
-    it { should have_selector('title', text: 'Sign in')}
+    it { should return_page_of('Sign in') }
   end
 
   describe "signin" do
     before { visit signin_path }
 
     describe "with invalid information" do
-      before { click_button  "Sign in" }
+      before  do
+        visit signin_path
+        click_button  "Sign in"
+      end
 
-      it { should have_selector('title', text: 'Sign in') }
+      it { should return_page_of('Sign in') }
       it { should have_error_message('Invalid') }
 
       describe "after visiting another page" do
@@ -30,17 +32,24 @@ describe "Authentication" do
     describe "with valid information" do
       let(:user) { FactoryGirl.create(:user) }
 
-      before { valid_sign_in(user) }
+      before { valid_sign_in user }
 
       it { should have_selector('title', text: user.name) }
+      it { should have_link('Users', href: users_path) }
       it { should have_link('Profile', href: user_path(user)) }
       it { should have_link('Settings', href: edit_user_path(user)) }
       it { should have_link('Sign out', href: signout_path) }
-      it {should_not have_link('Sign in', href: signin_path) }
+      it {should_not return_page_of('Sign in') }
 
-      describe "follewed by signout" do
+      describe "try to sign in again" do
+        before { visit signin_path }
+
+        it { should have_error_message("You already signed in") }
+      end
+
+      describe "followed by signout" do
         before { click_link "Sign out" }
-        it { should have_link('Sign in')}
+        it { should have_link('Sign up now') }
       end
     end
   end
@@ -53,7 +62,7 @@ describe "Authentication" do
 
         describe "visiting the editing page" do
           before { visit edit_user_path(user) }
-          it { should have_selector('title', text: 'Sign in') }
+          it { should return_page_of('Sign in') }
         end
 
         describe "submitting to the update action" do
@@ -67,11 +76,7 @@ describe "Authentication" do
       let(:user) { FactoryGirl.create(:user) }
       let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@gmail.com") }
 
-      before do
-        visit signin_path
-        valid_sign_in user
-      end
-
+      before { valid_sign_in user }
 
       describe "visiting User#edit page" do
         before { visit edit_user_path(wrong_user) }
@@ -102,6 +107,12 @@ describe "Authentication" do
         end
       end
 
+      describe "in the Users controller" do
+        describe "visiting the user index" do
+          before { visit users_path }
+          it { should return_page_of('Sign in') }
+        end
+      end
     end
   end
 end
