@@ -28,4 +28,15 @@ describe Tvveet do
     it { should_not be_valid }
   end
 
+  describe "with blank content" do
+    before { @tvveet.content = " " }
+
+    it { should_not be_valid }
+  end
+
+  describe "with content is too long" do
+    before { @tvveet.content = 'a' * 141 }
+
+    it { should_not be_valid }
+  end
 end
