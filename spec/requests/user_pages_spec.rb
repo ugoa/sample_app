@@ -163,7 +163,7 @@ describe "User Pages" do
 
       before { valid_sign_in non_admin }
 
-      describe "submitting a DELETE request to the User#destory action" do
+      describe "submitting a DELETE request to the User#destroy action" do
         before { delete user_path(user) }
 
         specify { response.should redirect_to(root_path) }
