@@ -13,10 +13,10 @@ require 'spec_helper'
 
 describe User do
   before do
-    @user = User.new( name: 'david',
-                      email: "david@example.com",
-                      password: "foobar",
-                      password_confirmation: "foobar")
+    @user = User.new(name: 'david',
+                     email: "david@example.com",
+                     password: "foobar",
+                     password_confirmation: "foobar")
   end
 
   subject { @user }
@@ -25,16 +25,17 @@ describe User do
   it { should respond_to(:email) }
   it { should respond_to(:remember_token) }
   it { should respond_to(:authenticate) }
-  it { should respond_to(:remember_token)}
-  it { should respond_to(:admin)}
-  it { should respond_to(:tvveets)}
+  it { should respond_to(:remember_token) }
+  it { should respond_to(:admin) }
+  it { should respond_to(:tvveets) }
 
   it { should be_valid }
   it { should_not be_admin }
 
   describe "with admin attibute set to 'true'" do
     before do
-      @user.save; @user.toggle!(:admin)
+      @user.save
+      @user.toggle!(:admin)
     end
     it { should be_admin }
   end
@@ -44,6 +45,32 @@ describe User do
       expect do
         User.new(amdin: true)
       end.should raise_error(ActiveModel::MassAssignmentSecurity::Error)
+    end
+  end
+
+  describe "tvveets associations" do
+    before { @user.save }
+
+    # #let only spring into existence when referenced, so we use #let! to
+    # make the tvveet exist immediately.
+    let!(:older_tvveet) do
+      Factory.create(:tvveet, user: @user, created_at: 1.day.ago)
+    end
+
+    let!(:newer_tvveet) do
+      Factory.create(:tvveet, user: @user, created_at: 1.hour.ago)
+    end
+
+    it "should have the right tvveets in right order" do
+      @user.tvveets.should == [newer_tvveet, older_tvveet]
+    end
+
+    it "should delete associated tvveets" do
+      tvveets = @user.tvveets
+      @user.destroy
+      tvveets.each do |tvveet|
+        Tvveet.find_by_id(tvveet.id).should be_nil
+      end
     end
   end
 
@@ -76,8 +103,8 @@ describe User do
     it "should be valid" do
       addresses = %w[user@foo.COM A_US-ER@f.b.org frst.lst@foo.jp a+b@baz.cn]
       addresses.each do |valid_address|
-      @user.email = valid_address
-      @user.should be_valid
+        @user.email = valid_address
+        @user.should be_valid
       end
     end
   end
@@ -120,14 +147,14 @@ describe User do
 
   describe "return value of authenticate method" do
     before { @user.save }
-    let(:found_user) {  User.find_by_email(@user.email) }
+    let(:found_user) { User.find_by_email(@user.email) }
 
     describe "with valid password" do
-      it { should == found_user.authenticate(@user.password)}
+      it { should == found_user.authenticate(@user.password) }
     end
 
     describe "with invalid password" do
-      let(:user_for_invalid_password) { found_user.authenticate("invalid")}
+      let(:user_for_invalid_password) { found_user.authenticate("invalid") }
 
       it { should_not == user_for_invalid_password }
       specify { user_for_invalid_password.should be_false }
