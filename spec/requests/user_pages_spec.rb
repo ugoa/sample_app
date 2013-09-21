@@ -12,13 +12,21 @@ describe "User Pages" do
 
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
+    let!(:t1) { FactoryGirl.create(:tvveet, user: user, content: 'Foo') }
+    let!(:t2) { FactoryGirl.create(:tvveet, user: user, content: 'Bar') }
     before do
       valid_sign_in user
       visit user_path(user)
     end
 
-    it { should have_selector('h1',     text: user.name) }
-    it { should have_selector('title',  text: user.name) }
+    it { should have_selector('h1', text: user.name) }
+    it { should have_selector('title', text: user.name) }
+
+    describe "tvveets" do
+      it { should have_content(t1.content) }
+      it { should have_content(t2.content) }
+      it { should have_content(user.tvveets.count) }
+    end
   end
 
   describe "#signup" do
@@ -31,19 +39,19 @@ describe "User Pages" do
       end
 
       describe "after submission" do
-        before {click_button submit}
+        before { click_button submit }
 
-        it { should have_selector('title', text: 'Sign up')}
-        it { should have_error_message('error')}
+        it { should have_selector('title', text: 'Sign up') }
+        it { should have_error_message('error') }
       end
     end
 
     describe "with valid information" do
       before do
-        fill_in "Name",     with: "Example user"
-        fill_in "Email",     with: "user@example.com"
-        fill_in "Password",     with: "111111"
-        fill_in "Confirmation",     with: "111111"
+        fill_in "Name", with: "Example user"
+        fill_in "Email", with: "user@example.com"
+        fill_in "Password", with: "111111"
+        fill_in "Confirmation", with: "111111"
       end
 
       it "should create a user" do
@@ -55,7 +63,7 @@ describe "User Pages" do
         let(:user) { User.find_by_email('user@example.com') }
         it { should have_selector('title', text: user.name) }
         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-        it { should have_link('Sign out')}
+        it { should have_link('Sign out') }
       end
     end
   end
@@ -70,16 +78,16 @@ describe "User Pages" do
     describe "page" do
       it { should have_selector('h1', text: "Update your profile") }
       it { should have_selector('title', text: "Edit user") }
-      it { should have_link('change', href: 'http://gravatar.com/emails')}
+      it { should have_link('change', href: 'http://gravatar.com/emails') }
     end
 
     describe "with invalid information" do
       before { click_button "Save changes" }
-      it { should have_error_message('error')}
+      it { should have_error_message('error') }
     end
 
     describe "with valid information" do
-      let(:new_name) {"New name"}
+      let(:new_name) { "New name" }
       let(:new_email) { "new@example.com" }
 
       before do
@@ -104,28 +112,28 @@ describe "User Pages" do
     let(:user) { FactoryGirl.create(:user) }
 
     before(:all) { 30.times { FactoryGirl.create(:user) } }
-    after(:all) { User.delete_all}
+    after(:all) { User.delete_all }
 
     before do
       valid_sign_in(user)
       visit users_path
     end
 
-    it { should return_page_of('All users')}
+    it { should return_page_of('All users') }
 
     describe "pagination" do
       it { should have_selector('div.pagination') }
 
       it "should list each user" do
         User.paginate(page: 1, per_page: 10).each do |user|
-          page.should have_selector('li', text:user.name)
+          page.should have_selector('li', text: user.name)
         end
       end
     end
   end
 
   describe "delete links" do
-    it {should_not have_link('delete') }
+    it { should_not have_link('delete') }
 
     describe "as an admin user" do
       let(:admin) { FactoryGirl.create(:admin) }

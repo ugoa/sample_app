@@ -9,4 +9,15 @@
       </h1>
     </section>
   </aside>
+
+  <div class="span8">
+    <% if @user.tvveets.any? %>
+      <h3>Tvveets (<%= @user.tvveets.count %>)</h3>
+      <ol class="tvveets">
+        <%= render @tvveets %>
+      </ol>
+      <%= will_paginate @tvveets %>
+    <% end %>
+  </div>
+
 </div>
