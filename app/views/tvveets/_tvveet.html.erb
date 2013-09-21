@@ -1,8 +1,5 @@
 <li>
-  <span class="content"><%= tvveet.content %></span>
-  <span class="timestamp">
-    Posted <%= time_ago_in_words(tvveet.created_at) %> ago.
-  </span>
+  <%=	render 'shared/content', tvveet: tvveet %>
 
   <% if current_user?(tvveet.user) %>
     <%=	link_to "delete", tvveet, method: :delete, confirm: "You sure?", title: tvveet.content %>
