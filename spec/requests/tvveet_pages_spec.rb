@@ -30,4 +30,16 @@ describe "Tvveet pages" do
     end
   end
 
+  describe "tvveet destruction" do
+    before { FactoryGirl.create(:tvveet, user: user) }
+
+    describe "as correct user" do
+      before { visit user_path(user) }
+
+      it "should be able to delete a tvveet" do
+        expect { click_link 'delete' }.should change(Tvveet, :count).by(-1)
+      end
+    end
+  end
+
 end
