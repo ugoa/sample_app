@@ -24,6 +24,11 @@ class User < ActiveRecord::Base
   validates :password, length: {minimum: 6}
   validates :password_confirmation, presence: true
 
+  def feed
+    #User.where("user_id = ?", id)
+    tvveets
+  end
+
   private
 
   def create_remember_token

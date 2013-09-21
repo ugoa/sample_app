@@ -1,6 +1,10 @@
 class StaticPagesController < ApplicationController
+
   def home
-    @tvveet = current_user.tvveets.build if signed_in?
+    if signed_in?
+      @tvveet = current_user.tvveets.build
+      @feed_items = current_user.feed.paginate(page: params[:page])
+    end
   end
 
   def help

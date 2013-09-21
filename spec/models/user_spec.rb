@@ -72,6 +72,16 @@ describe User do
         Tvveet.find_by_id(tvveet.id).should be_nil
       end
     end
+
+    describe "status" do
+      let(:unfollowed_tvveet) do
+        FactoryGirl.create(:tvveet, user: FactoryGirl.create(:user))
+      end
+
+      its(:feed) {should include(newer_tvveet) }
+      its(:feed) {should include(older_tvveet) }
+      its(:feed) {should_not include(unfollowed_tvveet) }
+    end
   end
 
   describe "when name is not present" do
