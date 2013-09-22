@@ -33,8 +33,7 @@ class User < ActiveRecord::Base
   validates :password_confirmation, presence: true
 
   def feed
-    #User.where("user_id = ?", id)
-    tvveets
+    Tvveet.from_users_followed_by(self)
   end
 
   def following?(other_user)
