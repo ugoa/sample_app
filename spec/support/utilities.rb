@@ -6,7 +6,6 @@ end
 
 RSpec::Matchers.define :return_page_of do |topic|
   match do |page|
-    page.should have_selector('h1', text: topic)
     page.should have_selector('title', text: topic)
   end
 end

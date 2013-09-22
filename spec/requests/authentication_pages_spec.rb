@@ -69,6 +69,16 @@ describe "Authentication" do
           before { put user_path(user) } # #put is not a Capybara but a Rspec feature.
           specify { response.should redirect_to(signin_path) }
         end
+
+        describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should return_page_of('Sign in') }
+        end
+
+        describe "visiting the following page" do
+          before { visit followers_user_path(user) }
+          it { should return_page_of('Sign in') }
+        end
       end
 
       describe "in the Tvveets controller" do

@@ -182,15 +182,41 @@ describe "User Pages" do
 
       it { should have_error_message("Invalid") }
 
-      #describe "sending post request to user_path " do
-      #  let(:new_user) { FactoryGirl.build(:user) }
-      #
-      #  before do
-      #    post :create, user: @new_user
-      #  end
-      #
-      #  it { should have_error_message("Invalid") }
-      #end
+      pending "sending post request to user_path " do
+        let(:new_user) { FactoryGirl.build(:user) }
+
+        before do
+          post :create, user: @new_user
+        end
+
+        it { should have_error_message("Invalid") }
+      end
+    end
+  end
+
+  describe "following/followers" do
+    let(:user) {FactoryGirl.create(:user)}
+    let(:other_user) {FactoryGirl.create(:user)}
+    before{ user.follow!(other_user) }
+
+    describe "followed users" do
+      before do
+        valid_sign_in user
+        visit following_user_path(user)
+      end
+
+      it { should return_page_of('Following') }
+      it { should have_link(other_user.name, href: user_path(other_user))}
+    end
+
+    describe "followers" do
+      before do
+        valid_sign_in other_user
+        visit followers_user_path(other_user)
+      end
+
+      it { should return_page_of('Followers') }
+      it { should have_link(user.name, href: user_path(user)) }
     end
   end
 
