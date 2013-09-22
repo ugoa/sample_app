@@ -32,4 +32,14 @@ describe Relationship do
       Relationship.find_by_follower_id(relationship.follower_id).should be_nil
     end
   end
+
+  describe "when followed id is not present" do
+    before { relationship.followed_id = nil }
+    it { should_not be_valid}
+  end
+
+  describe "when followe id is not present" do
+    before { relationship.follower_id = nil }
+    it { should_not be_valid}
+  end
 end
