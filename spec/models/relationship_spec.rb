@@ -26,11 +26,25 @@ describe Relationship do
   end
 
   describe "destroy dependency" do
-    before { follower.destroy }
 
-    it "should be destroyed when follower was being deleted" do
-      Relationship.find_by_follower_id(relationship.follower_id).should be_nil
+    # the next twe examples use different ideas.
+    describe "destroy follower" do
+      it "should be destroyed when follower was being deleted" do
+        connections = follower.relationships
+        follower.destroy
+        connections.each do |relationship|
+          Relationship.find_by_follower_id(relationship.follower_id).should be_nil
+        end
+      end
     end
+
+    describe "destroy followed user" do
+      before { followed.destroy }
+      it "should be destroyed when followed user was being deleted" do
+        Relationship.find_by_followed_id(relationship.followed_id).should be_nil
+      end
+    end
+
   end
 
   describe "when followed id is not present" do
